@@ -1,115 +1,108 @@
+// ignore_for_file: prefer_const_constructors, avoid_print, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyApp();
+}
+
+class _MyApp extends State<MyApp> {
+  var now = DateTime.now();
+  var _time = "Initialising...";
+  var _sign = "";
+  var _num = 0;
+  var _extra = "";
+
+  @override
+  void initState(){
+    Timer.periodic(Duration(milliseconds:500), (Timer t) => setState((){
+      now = DateTime.now();
+      _time = now.hour.toString() + ":" + now.minute.toString().padLeft(2, '0');
+      var num = (now.hour*60 + now.minute) % 720 - 260;
+      if ((num-720).abs() < num.abs()) {
+        num -= 720;
+      }
+      _num = num.abs();
+      if (num >= 0) {
+        _sign = "+";
+      } else {
+        _sign = "-";
+      }
+      _extra = "";
+    }));
+    super.initState();
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      debugShowCheckedModeBanner: false,
+      home: SafeArea(
+        child: Scaffold(
+          backgroundColor: const Color(0xFF000000),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFE25822),
+            title: Text("Blaze it clock")
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("The time is " + _time + "\n", style: TextStyle(fontSize: 18.0, color: const Color(0xFFFFFFFF))),
+                Text("blaze it " + _sign, style: TextStyle(fontSize: 70.0, color: const Color(0xFFFFFFFF))),
+                Text(_num.toString(), style: TextStyle(fontSize: 120.0, fontWeight: FontWeight.bold, color: const Color(0xFFFFFFFF))),
+                Text(_extra, style: TextStyle(fontSize: 18.0, color: const Color(0xFFFFFFFF))),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+          ),
+          drawer: Drawer(
+            child: ListTile(
+              title: Text('''\nThis app counts the number of minutes to 4:20 (am/pm).
+
+Nice timings: (works for both am and pm)
+1:29 - blaze it + 123456789
+1:38 - blaze it + 12345678
+2:17 - blaze it - 123
+2:35 - blaze it - 12345
+3:11 - blaze it - 69
+3:38 - blaze it - 42
+4:11 - blaze it - 696969
+4:29 - blaze it + 696969
+5:02 - blaze it + 42
+5:29 - blaze it + 69
+6:05 - blaze it + 12345
+6:23 - blaze it + 123
+7:02 - blaze it - 12345678
+7:11 - blaze it - 123456789
+7:46 - blaze it - 1234
+8:11 - blaze it - 6969
+8:13 - blaze it - 1234567
+8:29 - blaze it + 420696969
+8:50 - blaze it - 1234567890
+9:20 - blaze it - 420
+9:29 - blaze it + 42069
+9:56 - blaze it + 123456
+10:44 - blaze it - 123456
+11:11 - blaze it - 42069
+11:20 - blaze it + 420
+11:50 - blaze it + 1234567890
+12:11 - blaze it - 420696969
+12:27 - blaze it + 1234567
+12:29 -  blaze it + 6969
+12:54 - blaze it + 1234'''),
             ),
-          ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
